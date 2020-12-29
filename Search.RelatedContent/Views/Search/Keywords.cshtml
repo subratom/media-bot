@@ -1,0 +1,76 @@
+﻿@model Search.RelatedContent.Models.KeywordResults
+@{
+    ViewBag.Title = "Global AspenCore Media Search - Elastic Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <a class="btn btn-default btn-sm" role="button" href="@Url.Action("PartNumbersMediaSearch","Search")">Part Numbers Media Search</a>
+</div>
+
+@using (Ajax.BeginForm("Keywords", "Search", new { }, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "container" }, new { @class = "search_bar huge" }))
+{
+    <div class="search_dropdown" style="width: 16px;">
+    </div>
+    @Html.TextBoxFor(x => x.Query.QueryText, new { placeholder = "Keyword Search" })
+    <button type="submit" value="Search">Search </button>
+
+}
+
+@if (Model!=null && Model.Results != null)
+{
+    <div class="container">
+        <div class="h4">Search Results </div>
+        @if (Model.Results.Count() > 0)
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th><b>Site</b></th>
+                        <th colspan="2"><b>Article</b></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Results)
+                    {
+                        <tr>
+                            <td><img width="100px" src="@Html.DisplayFor(modelItem => item.ImageUrl)" /></td>
+                            <td>
+                                <a target="_blank" href="@Html.DisplayFor(modelItem => item.Url)">@Html.DisplayFor(modelItem => item.Title)</a>
+                                <p>@Html.DisplayFor(modelItem => item.Description)</p>
+                                @if (item.PartNumbers != null)
+                                {
+                                    <p> Part Numbers: </p>
+                                    <ul>
+                                        @foreach (var part in item.PartNumbers)
+                                        {
+                                            <li><a href="https://www.opendatasheets.com/search?text=@Html.DisplayFor(i => part)" target="_blank">@Html.DisplayFor(i => part)</a></li>
+                                        }
+                                    </ul>
+                                }
+                            </td>
+                            <td>
+                                <a target="_blank" href="@Url.Action("RelatedContent", "Search", new { Url = item.Url })" class="btn btn-default btn-xs" role="button">Related Content</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <table class="table">
+                <tr>
+                    <th>
+                        No results returned
+                    </th>
+
+                </tr>
+            </table>
+        }
+
+
+    </div>
+
+
+}
